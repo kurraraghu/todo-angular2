@@ -1,0 +1,31 @@
+<div class="container">
+  <nz-table #todoList [nzData]="todos">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Tasks</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let todo of todoList.data">
+        <td>
+          <nz-switch
+            [ngModel]="todo.completed"
+            [nzCheckedChildren]="checkedTemplate"
+            [nzUnCheckedChildren]="unCheckedTemplate"
+            (ngModelChange)="onToggle($event, todo.id)"
+          ></nz-switch>
+          <ng-template #checkedTemplate
+            ><i nz-icon nzType="check"></i
+          ></ng-template>
+          <ng-template #unCheckedTemplate
+            ><i nz-icon nzType="close"></i
+          ></ng-template>
+        </td>
+
+        <td>{{ todo.title }}</td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>
