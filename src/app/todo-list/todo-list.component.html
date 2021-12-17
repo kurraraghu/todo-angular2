@@ -3,29 +3,84 @@
     <thead>
       <tr>
         <th></th>
+        <th></th>
         <th>Tasks</th>
+        <th>
+          <button nz-button nzType="primary" nzSize="large" nzShape="round" (click)="addNewTodo()">
+            <i nz-icon nzType="plus" nzTheme="outline"></i> Add task
+          </button>
+        </th>
       </tr>
     </thead>
 
     <tbody>
-      <tr *ngFor="let todo of todoList.data">
-        <td>
-          <nz-switch
-            [ngModel]="todo.completed"
-            [nzCheckedChildren]="checkedTemplate"
-            [nzUnCheckedChildren]="unCheckedTemplate"
-            (ngModelChange)="onToggle($event, todo.id)"
-          ></nz-switch>
-          <ng-template #checkedTemplate
-            ><i nz-icon nzType="check"></i
-          ></ng-template>
-          <ng-template #unCheckedTemplate
-            ><i nz-icon nzType="close"></i
-          ></ng-template>
-        </td>
-
-        <td>{{ todo.title }}</td>
-      </tr>
+      <ng-container  *ngFor="let todo of todoList.data;trackBy:trackByTodo">
+        <tr>
+          <td [nzShowExpand]="todo.subTasks && todo.subTasks.length" [nzExpand]="!expandSet.has(todo.id)" (nzExpandChange)="onExpandChange(todo.id, $event)"></td>
+          <td class="completed-status">
+            <nz-switch
+              [ngModel]="todo.completed"
+              [nzCheckedChildren]="checkedTemplate"
+              [nzUnCheckedChildren]="unCheckedTemplate"
+              (ngModelChange)="onToggle($event, todo.id)"
+            ></nz-switch>
+            <ng-template #checkedTemplate
+              ><i nz-icon nzType="check"></i
+            ></ng-template>
+            <ng-template #unCheckedTemplate
+              ><i nz-icon nzType="close"></i
+            ></ng-template>
+          </td>
+          <td>
+            <div nz-tooltip nzTooltipTitle="Click here to edit" class="editable-cell" [hidden]="editId === todo.id && !editSubtaskId" (click)="startEdit(todo.id)">
+              {{ todo.title }}
+            </div>
+            <input [hidden]="editId !== todo.id || editSubtaskId" type="text" nz-input [(ngModel)]="todo.title" (blur)="stopEdit()" placeholder="Task"/>
+          </td>
+          <td class="action-items">
+            <button nz-button (click)="addNewSubTask(todo.id)" nz-tooltip nzTooltipTitle="Add new sub-task">
+              <i nz-icon nzType="plus-square" nzTheme="twotone"></i>
+            </button>
+            <button nz-button nz-popconfirm nzPopconfirmTitle="Are you sure to delete this todo?" (nzOnConfirm)="deleteTodo(todo.id)" nz-tooltip nzTooltipTitle="Delete task">
+              <i nz-icon nzType="delete" nzTheme="twotone"></i>
+            </button>
+          </td>
+        </tr>
+        <tr [nzExpand]="todo.subTasks && todo.subTasks.length && !expandSet.has(todo.id)" >
+          <nz-table #childTodo [nzData]="todo.subTasks"  nzShowPagination="false">
+            <tbody>
+              <tr *ngFor="let todoChild of childTodo.data;trackBy:trackByTodo">
+                <td class="empty-cell"></td>
+                <td class="completed-status">
+                  <nz-switch
+                    [ngModel]="todoChild.completed"
+                    [nzCheckedChildren]="checkedTemplate"
+                    [nzUnCheckedChildren]="unCheckedTemplate"
+                    (ngModelChange)="onToggle($event,todo.id,todoChild.id)"
+                  ></nz-switch>
+                  <ng-template #checkedTemplate
+                    ><i nz-icon nzType="check"></i
+                  ></ng-template>
+                  <ng-template #unCheckedTemplate
+                    ><i nz-icon nzType="close"></i
+                  ></ng-template>
+                </td>
+                <td>
+                  <div nz-tooltip nzTooltipTitle="Click here to edit" class="editable-cell" [hidden]="editSubtaskId === todoChild.id" (click)="startEditSubtask(todo.id,todoChild.id)">
+                    {{ todoChild.title }}
+                  </div>
+                  <input [hidden]="editSubtaskId !== todoChild.id" type="text" nz-input [(ngModel)]="todoChild.title" (blur)="stopEditSubtask()" placeholder="Sub task"/>
+                </td>
+                <td class="action-items">
+                  <button nz-tooltip nzTooltipTitle="Delete sub-task" nz-popconfirm nzPopconfirmTitle="Are you sure to delete this sub task?" (nzOnConfirm)="deleteSubtask(todo.id,todoChild.id)">
+                   <i nz-icon nzType="delete" nzTheme="twotone"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </tr>
+      </ng-container>
     </tbody>
   </nz-table>
 </div>

@@ -1,8 +1,25 @@
-.container {
-  width: 50vw;
-  // margin: auto;
-  padding: 2%;
-  border-radius: 16px;
-  box-shadow: 6px 6px 20px rgba(#8892b3, 0.5);
-  background-color: #fff;
-}
+  .editable-cell {
+    position: relative;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+
+  .editable-row:hover .editable-cell {
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    padding: 4px 11px;
+    
+  }
+  td.completed-status.ant-table-cell{
+    width: 80px;
+  }
+  td.empty-cell.ant-table-cell{
+    width: 20px;
+  }
+  
+  td.action-items.ant-table-cell{
+      text-align: center;
+      & > * {
+        margin: 0px 5px;
+    }
+  }
